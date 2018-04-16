@@ -1,0 +1,29 @@
+{
+  "name": "shuoshuo",
+  "version": "1.0.0",
+  "description": "shuoshuo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrJamesFeng/shuoshuo.git"
+  },
+  "keywords": [
+    "shuoshuo"
+  ],
+  "author": "james",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrJamesFeng/shuoshuo/issues"
+  },
+  "homepage": "https://github.com/MrJamesFeng/shuoshuo#readme",
+  "dependencies": {
+    "ejs": "^2.5.8",
+    "express": "^4.16.3",
+    "formidable": "^1.2.1",
+    "gm": "^1.23.1",
+    "mongodb": "^3.0.6"
+  }
+}
