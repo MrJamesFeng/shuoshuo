@@ -1,5 +1,11 @@
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
+      <style type="text/css">
+        .avatar{
+          height: 40px;
+          width: 40px;
+        }
+      </style>>
        <ul class="nav navbar-nav navbar-left">
         <li <%if(active =="首页"){%> class = active <%}%>><a href="#">班级说说 <span class="sr-only">(current)</span></a></li>
         <li <%if(active =="全部说说"){%> class = active <%}%>><a href="#">全部说说</a></li>
@@ -26,6 +32,7 @@
         <%}else{%>
          <li>
           <a href="#">欢迎您,<%= username%></a>
+          <a href="#"><img class="avatar" src="/avatar/<%= avatar %>"/></a>
         </li>
          <li><a href="#" id="setting">设置</a></li>
         <%}%>

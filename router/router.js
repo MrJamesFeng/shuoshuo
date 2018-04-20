@@ -2,13 +2,16 @@ var formidable = require('formidable')
 var md5 = require('../model/md5.js')
 var util = require('util')
 var db = require('../model/db.js')
-
+var path = require("path");
+var fs =require("fs")
+var gm = require("gm")
 exports.showIndex = (req,res,next)=>{
 
 	var renderData = {
 		login:req.session.login=="1",
 		 username:req.session.username,
-		 active:"首页"
+		 active:"首页",
+		 avatar:"avatar.jpg"
 	}
 	res.render("index",renderData)
 
@@ -18,7 +21,8 @@ exports.register = (req,res,next)=>{
 	var renderData = {
 		login:req.session.login=="1",
 		 username:req.session.username,
-		 active:""
+		 active:"",
+		 avatar:path.normalize(__dirname+"/../avatar/avatar.jpg")
 	}
 	res.render("regist",renderData)
 }
@@ -91,12 +95,67 @@ exports.showAvatar = (req,res,next)=>{
 	var renderData = {
 		login:req.session.login=="1",
 		 username:req.session.username,
-		 active:""
+		 active:"",
+		 avatar:req.session.avatar
 	}
 	res.render("avatar",renderData)
 }
 
 exports.avatar = (req,res,next)=>{
+	console.log("-------------avatar--------------");
+	if (req.session.login!="1") {
+		res.end("请先登录!")
+	}
+	console.log(" __dirname=", __dirname,path.normalize(__dirname+"/../avatar"));
+	var form = new formidable.IncomingForm();
 
+	form.uploadDir = path.normalize(__dirname+"/../avatar")
+    form.parse(req, function (err, fields, files) {
+
+        console.log(files);
+        var oldpath = files.touxiang.path;
+
+        var newpath = path.normalize(__dirname + "/../avatar" + "/" + req.session.username + ".jpg")
+        fs.rename(oldpath, newpath, function (err) {
+            if (err) {
+                res.send("-1");
+                return;
+            }
+            req.session.avatar = req.session.username + ".jpg"
+            // 跳转到切的业务
+            res.redirect("/cut");
+        })
+    });
+    
 	
+}
+
+exports.cut = (req,res,next)=>{
+	res.render("cut",{avatar:req.session.avatar})
+
+}
+exports.docut = (req,res,next)=>{
+	console.log("filename=",filename)
+	var filename = req.session.avatar;
+    var w = req.query.w;
+    var h = req.query.h;
+    var x = req.query.x;
+    var y = req.query.y;
+
+    gm("./avatar/" + filename)
+        .crop(w, h, x, y)
+        .resize(100, 100, "!")
+        .write("./avatar/" + filename, function (err) {
+            if (err) {
+                res.send("-1");
+                return;
+            }
+            //更改数据库当前用户的avatar这个值
+            db.updateMany("users", {"username": req.session.username}, {
+                $set: {"avatar": req.session.avatar}
+            }, function (err, results) {
+                res.send("1");
+            });
+        });
+
 }

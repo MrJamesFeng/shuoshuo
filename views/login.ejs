@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 
@@ -11,7 +10,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>班级说说欢迎您/title>
+    <title>登录</title>
 
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -37,13 +36,12 @@
       }
     </style>
   </head>
-  <title>登录</title>
-  
-  <% include header.ejs %>
 
+  <% include header.ejs %>
+  
  <div class="jumbotron">
       <div class="container">
-<form action="" method="post">
+<form action="/" method="post">
   <div class="form-group">
     <label for="username">会员名</label>
     <input type="username" class="form-control" id="username" placeholder="输入字母数字">
@@ -53,11 +51,10 @@
     <input type="password" class="form-control" id="password" placeholder="至少6位">
   </div>
   
-  
-  <button type="button" class="btn btn-default" id="submit">登录</button>
+  <button type="button" class="btn btn-default" id="submit">提交</button>
 </form>
 
-<div class="alert alert-warning" role="alert" id="alert-warning">登录失败</div>
+<div class="alert alert-warning" role="alert" id="alert-warning">注册失败</div>
   </div>
       <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -66,9 +63,7 @@
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/js/ie10-viewport-bug-workaround.js"></script>
-
-    <script type="text/JavaScript">
+<script type="text/JavaScript">
 
       $("input").focus(function(){
         $("#alert-warning").fadeOut()
@@ -97,6 +92,7 @@
       })
         
     </script>
+
 
 </body>
 </html>

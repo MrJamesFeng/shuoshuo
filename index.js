@@ -12,6 +12,7 @@ app.use(session({
 
 app.set("view engine","ejs")
 app.use(express.static("./public"))
+app.use("/avatar",express.static("./avatar"))
 
 app.get("/",router.showIndex)
 
@@ -24,5 +25,9 @@ app.post("/login",router.login)
 app.get("/showAvatar",router.showAvatar)
 
 app.post("/avatar",router.avatar)
+
+app.get("/cut",router.cut)
+app.get("/docut",router.docut)
+
 
 app.listen(3000)
