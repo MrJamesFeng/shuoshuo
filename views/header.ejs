@@ -30,11 +30,9 @@
          <li><a href="/showlogin">登录</a></li>
         <li><a href="/regist" id="showRegist">注册</a></li>
         <%}else{%>
-         <li>
-          <a href="#">欢迎您,<%= username%></a>
-          <a href="#"><img class="avatar" src="/avatar/<%= avatar %>"/></a>
-        </li>
-         <li><a href="#" id="setting">设置</a></li>
+        <li><a href="#">欢迎您,<%= username%></a></li>
+        <li><a href="#"><img class="avatar" src="/avatar/<%= avatar %>"/></a></li>
+        <li><a href="#" id="setting">设置</a></li>
         <%}%>
        
       </ul>

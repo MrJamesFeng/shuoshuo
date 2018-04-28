@@ -29,6 +29,15 @@
       <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <style type="text/css">
+      .alert{
+        display: none;
+      }
+      .avatar{
+        height: 60px;
+        width: 60px;
+      }
+    </style>
   </head>
 
   <body>
@@ -36,12 +45,49 @@
     <% include header.ejs %>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
+   
+
     <div class="jumbotron">
+      <% if(!login) {%>
+
+      <div class="row">
+
+        <div class="col-md-6">
+           <h1>Hello, welcome!</h1>
+           <p>This is a xxxxxxxxxxxxsdefsfdsvdvsvdsvsdvsdvdsvdsvsdvsd.xxxxxxxxxxxxsdefsfdsvdvsdvsd</p>
+           <p><a class="btn btn-primary btn-lg" href="/regist" role="button">注册</a></p>
+        </div>
+
+        <div class="col-md-6">
+            <form action="/login" method="post">
+              <div class="form-group">
+                <label for="username">会员名</label>
+                <input type="username" class="form-control" id="username" placeholder="输入字母数字">
+              </div>
+              <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" class="form-control" id="password" placeholder="至少6位">
+              </div>
+              
+              <button type="button" class="btn btn-default" id="submit">提交</button>
+            </form>
+        </div>
+
+      <div class="alert alert-warning" role="alert" id="alert-warning">注册失败</div>
+      <% }else{ %>
       <div class="container">
-        <h1>Hello, world!</h1>
-        <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+        <div class="row" >
+          <div class="col-lg-1"> <a href="/showAvatar"><img class = "avatar" src="/avatar/<%= avatar %>" alt=""></a></div>
+           <div class="col-lg-6">
+            <p><%= username%></p>
+            <textarea name="statement" id="statement" cols="80" rows="4"></textarea>
+            <button type="button" class="btn btn-default" id="submitstatement">发言</button>
+          </div>
+        </div>
+        
       </div>
+        
+         <% }%>
     </div>
 
     <div class="container">
@@ -89,7 +135,47 @@
       $("#setting").click(function(){
         window.location = "/showAvatar"
       })
-    </script>>
+
+      $("input").focus(function(){
+        $("#alert-warning").fadeOut()
+      })
+
+      $("#submit").click(function(){
+
+       $.post("/login",{
+            "username":$("#username").val(),
+            "password":$("#password").val()
+      },function(result){
+          if (result==1) {
+            alert("登录成功即将跳转到首页！")
+            window.location='/'
+          }else if(result==-1){
+            $("#alert-warning").html("用户不存在")
+            $("#alert-warning").fadeIn()
+          }else if(result==-2){
+            $("#alert-warning").html("密码错误")
+            $("#alert-warning").fadeIn()
+          }else if(result==-3){
+
+          }
+        console.log("result===="+result);
+      })
+
+      })
+
+      $("#submitstatement").click(function(){
+        alert("xxx")
+         $.post("/doPost",{
+            "content":$("#statement").val(),
+      },function(result){
+          alert(result)
+        console.log("result===="+result);
+      })
+
+      })
+    </script>
+
+
   </body>
 </html>
 

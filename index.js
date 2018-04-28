@@ -29,5 +29,6 @@ app.post("/avatar",router.avatar)
 app.get("/cut",router.cut)
 app.get("/docut",router.docut)
 
+app.post("/doPost",router.doPost)
 
 app.listen(3000)
