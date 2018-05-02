@@ -23,12 +23,24 @@
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="/js/ie-emulation-modes-warning.js"></script>
-
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/underscore-noflect.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+
+    <script type="text/template" id="moban">
+      <div class="col-md-4 grid">
+          <h2><img width="40" src="/avatar/{{=avatar}}" alt="">{{=username}}</h2>
+          <p>{{=content}}</p>
+          <p>{{=createTime}}</p>
+          <p><a class="btn btn-default" href="#" role="button">查看详情</a></p>
+        </div>
+    </script>
+
     <style type="text/css">
       .alert{
         display: none;
@@ -36,6 +48,9 @@
       .avatar{
         height: 60px;
         width: 60px;
+      }
+      .grid{
+        height: 200px;
       }
     </style>
   </head>
@@ -45,8 +60,8 @@
     <% include header.ejs %>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
-   
 
+  
     <div class="jumbotron">
       <% if(!login) {%>
 
@@ -89,26 +104,21 @@
         
          <% }%>
     </div>
-
     <div class="container">
+      <nav>
+          <ul class="pageindition nav nav-pills">
+          </ul>
+      </nav>
+    </div>
+
+    <div class="container" id="quanbushuohsuo">
+      
+    </div>
+
+ 
+  <div class="container">
       <!-- Example row of columns -->
-      <div class="row">
-        <div class="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-        <div class="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-       </div>
-        <div class="col-md-4">
-          <h2>Heading</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div>
-      </div>
+   
 
       <hr>
 
@@ -126,12 +136,31 @@
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/js/ie10-viewport-bug-workaround.js"></script>
-    
     <script type="text/javascript">
+      var pageNo = 0
+      $.get("/getPostAmount",function(res){
+        var pageAmount = Math.ceil(parseInt(res)/9)
+        
+        console.log("pageAmount="+pageAmount);
+        for(var i=0;i<pageAmount;i++){
+          $(".pageindition").append($("<li><a href=\"#\"> "+i+"</a></li>"))
+        }
+         $(".pageindition li").click(function(){
+            var page = $(this).index()
+            pageNo = page
+            $(this).addClass("active").siblings().removeClass("active")
+            console.log("page="+page);
+            getShuoshuo(page)
+          })
+         
+        getShuoshuo(0)
+      })
+
       $("#showRegist").click(function(){
         window.location('/regist')
         console.log("showRegist");
       })
+
       $("#setting").click(function(){
         window.location = "/showAvatar"
       })
@@ -142,7 +171,7 @@
 
       $("#submit").click(function(){
 
-       $.post("/login",{
+      $.post("/login",{
             "username":$("#username").val(),
             "password":$("#password").val()
       },function(result){
@@ -163,16 +192,71 @@
 
       })
 
+
       $("#submitstatement").click(function(){
-        alert("xxx")
          $.post("/doPost",{
             "content":$("#statement").val(),
       },function(result){
-          alert(result)
-        console.log("result===="+result);
+        // console.log("result===="+result);
+        getShuoshuo(pageNo)
+      })
       })
 
-      })
+
+      function getShuoshuo(page){
+        console.log("getShuoshuo page="+page);
+         $("#quanbushuohsuo").html("")
+         $.get("/getAllshuoshuo?page="+page,function(res){
+            console.log("getAllshuoshuo?page=0 res=");
+            console.log(res);
+            var compiled = _.template($("#moban").html())
+
+            iterator(0)
+
+              function iterator(i){
+                if (res.result.length==i) {
+                  return
+                 }
+
+
+            $.get("/getUserinfo?username="+res.result[i].username,function(result){
+
+                console.log("getUserinfo=>");
+                console.log(result);
+                // res.result[i].avatar = result.result.avatar
+                res.result[i].avatar = "james.jpg"
+                var htmlstring = compiled(res.result[i])
+                console.log("htmlstring=\n"+htmlstring);
+                $("#quanbushuohsuo").append($(htmlstring))
+                iterator(i+1)
+            })}
+          })
+      }
+
+
+        // for(var i=0;i<res.result.length;i++){
+        //   console.log("xxxx"+i+res.result[i].username);
+        //   if (!res.result[i].username) {
+        //     continue
+        //   }
+        //   $.ajax({
+        //     url:"/getUserinfo?username="+res.result[i].username,
+        //     type:"GET",
+        //     async:false,
+        //     success:function(result){
+        //       console.log("getUserinfo=>");
+        //       console.log(result);
+        //     },
+        //     error:function(err){
+        //       console.log("getUserinfo=>");
+        //       console.log(err);
+        //     }
+
+        //   })
+        // }
+        
+        // console.log("getAllshuoshuo?page=0 err="+err);
+      // })
     </script>
 
 
