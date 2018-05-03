@@ -22,13 +22,27 @@
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="../public/js/ie-emulation-modes-warning.js"></script>
+
+    <script src="/js/ie-emulation-modes-warning.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/underscore-noflect.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+
+    <script type="text/template" id="moban">
+      <div class="col-md-4 grid">
+          <h2><img width="40" src="/avatar/{{=avatar}}" alt="">{{=username}}</h2>
+          <p>{{=content}}</p>
+          <p>{{=createTime}}</p>
+          <p><a class="btn btn-default" href="#" role="button">查看详情</a></p>
+        </div>
+    </script>
+
     <style type="text/css">
       .alert{
         display: none;
@@ -36,6 +50,9 @@
       .avatar{
         height: 60px;
         width: 60px;
+      }
+      .grid{
+        height: 200px;
       }
     </style>
     <script src="/js/underscore-noflect.js" type="text/javascript" ></script>
@@ -56,7 +73,7 @@
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
 
-
+  
     <div class="jumbotron">
       <% if(!login) {%>
 
@@ -100,6 +117,23 @@
          <% }%>
     </div>
 
+    <div class="container">
+      <nav>
+          <ul class="pageindition nav nav-pills">
+          </ul>
+      </nav>
+    </div>
+
+    <div class="container" id="quanbushuohsuo">
+      
+    </div>
+
+ 
+  <div class="container">
+      <!-- Example row of columns -->
+   
+
+
       <hr>
 
       <footer>
@@ -118,6 +152,25 @@
     <script src="/js/ie10-viewport-bug-workaround.js"></script>
 
     <script type="text/javascript">
+      var pageNo = 0
+      $.get("/getPostAmount",function(res){
+        var pageAmount = Math.ceil(parseInt(res)/9)
+        
+        console.log("pageAmount="+pageAmount);
+        for(var i=0;i<pageAmount;i++){
+          $(".pageindition").append($("<li><a href=\"#\"> "+i+"</a></li>"))
+        }
+         $(".pageindition li").click(function(){
+            var page = $(this).index()
+            pageNo = page
+            $(this).addClass("active").siblings().removeClass("active")
+            console.log("page="+page);
+            getShuoshuo(page)
+          })
+         
+        getShuoshuo(0)
+      })
+
 
       $("#showRegist").click(function(){
         window.location('/regist')
@@ -134,67 +187,95 @@
 
       $("#submit").click(function(){
 
-         $.post("/login",{
-              "username":$("#username").val(),
-              "password":$("#password").val()
-        },function(result){
-          console.log(result)
-            if (result==1) {
-              alert("登录成功即将跳转到首页！")
-              window.location='/'
-            }else if(result==-1){
-              $("#alert-warning").html("用户不存在")
-              $("#alert-warning").fadeIn()
-            }else if(result==-2){
-              $("#alert-warning").html("密码错误")
-              $("#alert-warning").fadeIn()
-            }else if(result==-3){
-            }
-              console.log("result===="+result);
-        })
+
+      $.post("/login",{
+            "username":$("#username").val(),
+            "password":$("#password").val()
+      },function(result){
+          if (result==1) {
+            alert("登录成功即将跳转到首页！")
+            window.location='/'
+          }else if(result==-1){
+            $("#alert-warning").html("用户不存在")
+            $("#alert-warning").fadeIn()
+          }else if(result==-2){
+            $("#alert-warning").html("密码错误")
+            $("#alert-warning").fadeIn()
+          }else if(result==-3){
+
+          }
+        console.log("result===="+result);
+
       })
+
 
 
       $("#submitstatement").click(function(){
          $.post("/doPost",{
             "content":$("#statement").val(),
       },function(result){
-          alert(result)
-        console.log("result===="+result);
+        // console.log("result===="+result);
+        getShuoshuo(pageNo)
+      })
       })
 
-      })
 
 
-      var $quanbushuoshuo = $("#quanbushuoshuo")
-      var complied = _.template($("#moban").html())
+      function getShuoshuo(page){
+        console.log("getShuoshuo page="+page);
+         $("#quanbushuohsuo").html("")
+         $.get("/getAllshuoshuo?page="+page,function(res){
+            console.log("getAllshuoshuo?page=0 res=");
+            console.log(res);
+            var compiled = _.template($("#moban").html())
 
-      $.get("/getAllShuoshuo?page=0",function(res){
+            iterator(0)
 
-        console.log("getAllShuoshuo?="+JSON.stringify(res))
+              function iterator(i){
+                if (res.result.length==i) {
+                  return
+                 }
 
-        for (var i = res.result.length - 1; i >= 0; i--) {
-          console.log(JSON.stringify(res.result[i]))
-           $.ajax(
-            {
-              url:"/getuserinfo?username="+res.result[i].username,
-              type:"get",
-              async:false,
-              success:function(err,result){
-              // console.log(JSON.stringify(result))
-              // res.result[i].avatar = result.avatar
-              res.result[i].avatar = "james.jpg"
-              console.log(res.result[i])
-              var html = complied(res.result[i])
-              $quanbushuoshuo.append(html)
-            }
-           })
-        }
 
-        })
+            $.get("/getUserinfo?username="+res.result[i].username,function(result){
 
+                console.log("getUserinfo=>");
+                console.log(result);
+                // res.result[i].avatar = result.result.avatar
+                res.result[i].avatar = "james.jpg"
+                var htmlstring = compiled(res.result[i])
+                console.log("htmlstring=\n"+htmlstring);
+                $("#quanbushuohsuo").append($(htmlstring))
+                iterator(i+1)
+            })}
+          })
+      }
+
+
+        // for(var i=0;i<res.result.length;i++){
+        //   console.log("xxxx"+i+res.result[i].username);
+        //   if (!res.result[i].username) {
+        //     continue
+        //   }
+        //   $.ajax({
+        //     url:"/getUserinfo?username="+res.result[i].username,
+        //     type:"GET",
+        //     async:false,
+        //     success:function(result){
+        //       console.log("getUserinfo=>");
+        //       console.log(result);
+        //     },
+        //     error:function(err){
+        //       console.log("getUserinfo=>");
+        //       console.log(err);
+        //     }
+
+        //   })
+        // }
         
-   
+        // console.log("getAllshuoshuo?page=0 err="+err);
+      // })
+
     </script>
 
 

@@ -179,27 +179,35 @@ exports.doPost = (req,res,next)=>{
 	})
 }
 
-exports.getAllShuoshuo =  (req,res,next)=>{
-	db.find('posts',{},{"pageamount":10,"page":req.query.page},function(err,result){
-		console.log("getAllShuoshuo result="+result)
-		res.json({"result":result})
-
-	})
-}
-exports.getuserinfo =  (req,res,next)=>{
-	console.log("getuserinfo="+req.query.username)
-	db.find('users',{"username":req.query.username},function(err,result){
-		console.log(result)
-		console.log(err)
-		if (err||result.length==0) {
+exports.getAllShuoshuo = (req,res,next)=>{
+	db.find("posts",{},{"pageamount":9,"page":req.query.page,"sort":{"createTime":-1}},function(err,result){
+		if (err) {
 			res.end("-1")
 			return
-			}
-		res.json({"result":{
-			username:result[0].username,
-			avatar:result[0].avatar,
-			_id:result[0]._id
-		}})
-
+		}
+		console.log({"posts":result});
+		res.json({"result":result})
 	})
+
+}
+
+exports.getUserinfo = (req,res,next)=>{
+	console.log("getUserinfo==》"+req.query.username);
+	// res.writeHead(200, {'content-type': 'text/plain'});
+	db.find("users",{},{"username":req.query.username},function(err,result){
+		if (err) {
+			console.log("getUserinfo");
+			console.log(err);
+			res.end("-1")
+			return
+		}
+		res.json({"result":result[0]})
+		// console.log({"result":result});
+	})
+}
+exports.getPostAmount = (req,res,next)=>{
+	db.getAllCount("posts",function(count){
+		res.end(count.toString())
+	})
+
 }

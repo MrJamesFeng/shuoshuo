@@ -33,7 +33,8 @@ app.post("/doPost",router.doPost)
 
 app.get("/getAllShuoshuo",router.getAllShuoshuo)
 
-app.get("/getuserinfo",router.getuserinfo)
+app.get("/getUserinfo",router.getUserinfo)
 
+app.get("/getPostAmount",router.getPostAmount)
 
 app.listen(3000)
