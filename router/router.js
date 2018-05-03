@@ -121,6 +121,7 @@ exports.avatar = (req,res,next)=>{
                 res.send("-1");
                 return;
             }
+
             req.session.avatar = req.session.username + ".jpg"
             // 跳转到切的业务
             res.redirect("/cut");
@@ -135,17 +136,18 @@ exports.cut = (req,res,next)=>{
 
 }
 exports.docut = (req,res,next)=>{
-	console.log("filename=",filename)
-	var filename = req.session.avatar;
     var w = req.query.w;
     var h = req.query.h;
     var x = req.query.x;
     var y = req.query.y;
-
-    gm("./avatar/" + filename)
+	// var filename = path.normalize(__dirname + "/../avatar" + "/" + req.session.avatar)
+	var filename = req.session.avatar
+	console.log(filename);
+    gm("./avatar/"+filename)
         .crop(w, h, x, y)
-        .resize(100, 100, "!")
-        .write("./avatar/" + filename, function (err) {
+        .resize(100, 100)
+        .write("./avatar/"+filename, function (err) {
+        	console.log(err);
             if (err) {
                 res.send("-1");
                 return;
@@ -157,5 +159,47 @@ exports.docut = (req,res,next)=>{
                 res.send("1");
             });
         });
+}
 
+exports.doPost = (req,res,next)=>{
+	var form = new formidable.IncomingForm();
+	form.parse(req, function(err, fields, files) {
+		res.writeHead(200, {'content-type': 'text/plain'});
+		var content = fields.content
+		console.log("content="+content);
+		db.insertOne("posts",{
+			username:req.session.username,
+			content:content,
+			createTime:new Date(),
+			avatar:req.session.avatar
+		},(err,response)=>{
+			if (err) {res.end("-1")}
+			res.end("1")	
+		})
+	})
+}
+
+exports.getAllShuoshuo =  (req,res,next)=>{
+	db.find('posts',{},{"pageamount":10,"page":req.query.page},function(err,result){
+		console.log("getAllShuoshuo result="+result)
+		res.json({"result":result})
+
+	})
+}
+exports.getuserinfo =  (req,res,next)=>{
+	console.log("getuserinfo="+req.query.username)
+	db.find('users',{"username":req.query.username},function(err,result){
+		console.log(result)
+		console.log(err)
+		if (err||result.length==0) {
+			res.end("-1")
+			return
+			}
+		res.json({"result":{
+			username:result[0].username,
+			avatar:result[0].avatar,
+			_id:result[0]._id
+		}})
+
+	})
 }

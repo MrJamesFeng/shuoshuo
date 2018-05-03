@@ -9,10 +9,10 @@
     <script type="text/javascript" src="/js/xiaoguo.js"></script>
     <style type="text/css">
         .avatar{
-            height: 100px;
-            width: 60px;
+            height: 800px;
+            width: 600px;
         }
-    </style>>
+    </style>
 </head>
 <body>
 
@@ -32,13 +32,13 @@
         var h = parseInt($(".jcrop-holder>div:first").css("height"));
         var x = parseInt($(".jcrop-holder>div:first").css("left"));
         var y = parseInt($(".jcrop-holder>div:first").css("top"));
-
         $.get("/docut",{
             "w" : w,
             "h" : h,
             "x" : x,
             "y" : y
         },function(result){
+            alert(result)
             if(result == "1"){
                 alert("改名成功");
                 window.location = "/";
