@@ -37,5 +37,8 @@ app.get("/getUserinfo",router.getUserinfo)
 
 app.get("/getPostAmount",router.getPostAmount)
 
+app.get("/showUser/:user",router.showUser)
+
+app.get("/userlist",router.userlist)
 
 app.listen(3000)

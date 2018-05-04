@@ -170,7 +170,8 @@ exports.doPost = (req,res,next)=>{
 		db.insertOne("posts",{
 			username:req.session.username,
 			content:content,
-			createTime:new Date()
+			createTime:new Date(),
+			avatar:req.session.avatar
 		},(err,response)=>{
 			if (err) {res.end("-1")}
 			res.end("1")	
@@ -209,4 +210,31 @@ exports.getPostAmount = (req,res,next)=>{
 		res.end(count.toString())
 	})
 
+}
+
+exports.showUser = (req,res,next)=>{
+	console.log("showUser===>"+req.params["user"]);
+	
+	db.find("posts",{"username":req.params["user"]},function(err,result){
+		var renderData = {
+		 user:req.params["user"],
+		 contents:result
+
+	}
+	console.log(renderData);
+		res.render("user",renderData)
+	})
+		
+	
+
+}
+
+exports.userlist= (req,res,next)=>{
+	db.find("users",{},{"pageamount":9,"page":req.query.page,"sort":{"createTime":-1}},function(err,result){
+		if (err) {
+			res.end("-1")
+			return
+		}
+		res.render("userlist",{"userlist":result})
+	})
 }
